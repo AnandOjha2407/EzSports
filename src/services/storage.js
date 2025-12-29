@@ -18,9 +18,17 @@ const apiCall = async (endpoint, options = {}) => {
   };
 
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const fullUrl = `${API_BASE_URL}${endpoint}`;
+    const response = await fetch(fullUrl, config);
     
     if (!response.ok) {
+      // Check if response is HTML (usually means wrong URL or 404 page)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        console.error('Received HTML instead of JSON. API URL might be incorrect:', fullUrl);
+        throw new Error(`API endpoint returned HTML instead of JSON. Please check VITE_API_URL environment variable. Current URL: ${API_BASE_URL}`);
+      }
+      
       const errorData = await response.json().catch(() => ({ message: 'API request failed' }));
       throw new Error(errorData.message || 'API request failed');
     }
@@ -28,6 +36,10 @@ const apiCall = async (endpoint, options = {}) => {
     const data = await response.json();
     return data;
   } catch (error) {
+    // Check for JSON parse errors (usually means HTML was returned)
+    if (error.message && error.message.includes('JSON')) {
+      console.error('JSON Parse Error - API Base URL:', API_BASE_URL, 'This usually means the URL is incorrect.');
+    }
     console.error('API Error:', error);
     throw error;
   }
