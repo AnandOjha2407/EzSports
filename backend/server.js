@@ -18,9 +18,18 @@ const PORT = process.env.PORT || 3000;
 
 // CORS Configuration
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? (process.env.FRONTEND_URL?.split(',') || []) // Comma-separated allowed origins
-    : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'], // Development
+  origin: (() => {
+    if (process.env.NODE_ENV === 'production') {
+      // In production, use FRONTEND_URL if set, otherwise allow all (for easier setup)
+      if (process.env.FRONTEND_URL) {
+        const origins = process.env.FRONTEND_URL.split(',').map(url => url.trim()).filter(url => url);
+        return origins.length > 0 ? origins : true;
+      }
+      return true; // Allow all origins if FRONTEND_URL not set
+    }
+    // Development origins
+    return ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
+  })(),
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

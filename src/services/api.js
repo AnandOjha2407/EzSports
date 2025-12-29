@@ -20,8 +20,14 @@ const apiCall = async (endpoint, options = {}) => {
     
     // Check if response is ok
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'API request failed' }))
-      throw new Error(errorData.message || 'API request failed')
+      let errorData
+      try {
+        errorData = await response.json()
+      } catch (e) {
+        errorData = { message: `HTTP ${response.status}: ${response.statusText}` }
+      }
+      console.error('API Error Response:', { status: response.status, statusText: response.statusText, data: errorData })
+      throw new Error(errorData.message || `API request failed with status ${response.status}`)
     }
     
     const data = await response.json()
@@ -29,7 +35,8 @@ const apiCall = async (endpoint, options = {}) => {
   } catch (error) {
     // Re-throw with more context
     if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-      throw new Error('Backend server is not available. Please ensure the API server is running.')
+      console.error('Network Error - API Base URL:', API_BASE_URL)
+      throw new Error('Backend server is not available. Please ensure the API server is running and VITE_API_URL is set correctly.')
     }
     console.error('API Error:', error)
     throw error
