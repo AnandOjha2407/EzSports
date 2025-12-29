@@ -105,11 +105,12 @@ git push origin main
 
    **Frontend Service (ezports-frontend):**
    - Go to frontend service → Environment tab
-   - Add this variable:
+   - Add this variable (IMPORTANT: Set this BEFORE building):
      ```
      VITE_API_URL=https://ezports-backend.onrender.com/api
      ```
      (Update with actual backend URL after backend deploys)
+     - **Note:** Vite environment variables are embedded at build time. If you set this after building, you need to rebuild/redeploy the frontend.
 
 6. Click **"Apply"** to deploy both services!
 
