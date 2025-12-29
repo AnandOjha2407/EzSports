@@ -49,6 +49,8 @@ const readOnlyLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
+    // Skip OPTIONS requests (CORS preflight)
+    if (req.method === 'OPTIONS') return true;
     // Skip rate limiting in development if needed (optional - commented out for safety)
     // return isDevelopment;
     return false;
@@ -63,6 +65,8 @@ const writeLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
+    // Skip OPTIONS requests (CORS preflight)
+    if (req.method === 'OPTIONS') return true;
     // Skip rate limiting in development if needed (optional - commented out for safety)
     // return isDevelopment;
     return false;
@@ -99,11 +103,14 @@ const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
+    // Skip OPTIONS requests (CORS preflight)
+    if (req.method === 'OPTIONS') return true;
     // Skip if route already has a specific limiter
     const path = req.path;
     return path.startsWith('/api/rooms') || 
            path.startsWith('/api/streams') || 
-           path.startsWith('/api/events');
+           path.startsWith('/api/events') ||
+           path.startsWith('/api/auth');
   },
 });
 app.use('/api/', generalLimiter);
@@ -114,6 +121,10 @@ const authLimiter = rateLimit({
   max: isDevelopment ? 50 : 10, // More lenient in development
   message: 'Too many authentication attempts, please try again later.',
   skipSuccessfulRequests: true,
+  skip: (req) => {
+    // Skip OPTIONS requests (CORS preflight)
+    return req.method === 'OPTIONS';
+  },
 });
 
 app.use('/api/auth', authLimiter);
