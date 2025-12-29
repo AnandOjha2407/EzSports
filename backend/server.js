@@ -20,22 +20,34 @@ const PORT = process.env.PORT || 3000;
 const corsOptions = {
   origin: (() => {
     if (process.env.NODE_ENV === 'production') {
-      // In production, use FRONTEND_URL if set, otherwise allow all (for easier setup)
+      // In production, use FRONTEND_URL if set and valid
       if (process.env.FRONTEND_URL) {
-        const origins = process.env.FRONTEND_URL.split(',').map(url => url.trim()).filter(url => url);
-        // Filter out invalid Railway default URLs (like just "railway.com" without subdomain)
-        const validOrigins = origins.filter(url => {
+        const frontendUrl = process.env.FRONTEND_URL.trim();
+        
+        // Check if it's an invalid/unresolved Railway service reference or default URL
+        if (frontendUrl === 'https://railway.com' || 
+            frontendUrl === 'http://railway.com' ||
+            frontendUrl === 'railway.com' ||
+            frontendUrl.includes('${{') || // Railway service reference not resolved
+            (!frontendUrl.startsWith('http://') && !frontendUrl.startsWith('https://'))) {
+          console.warn('⚠️  FRONTEND_URL is invalid or unresolved:', frontendUrl);
+          console.warn('⚠️  Allowing all origins for CORS (please set FRONTEND_URL to your actual frontend URL)');
+          return true; // Allow all if invalid to prevent CORS errors
+        }
+        
+        // Split by comma for multiple origins
+        const origins = frontendUrl.split(',').map(url => url.trim()).filter(url => {
           if (!url) return false;
-          if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
-          // Exclude generic railway.com without subdomain
+          // Filter out invalid Railway default URLs
           if (url === 'https://railway.com' || url === 'http://railway.com') return false;
+          if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
           return true;
         });
-        if (validOrigins.length > 0) {
-          console.log('✅ CORS allowed origins:', validOrigins);
-          return validOrigins;
+        
+        if (origins.length > 0) {
+          console.log('✅ CORS allowed origins:', origins);
+          return origins;
         }
-        console.warn('⚠️  FRONTEND_URL contains invalid URLs - allowing all origins for CORS');
       }
       console.warn('⚠️  FRONTEND_URL not set - allowing all origins for CORS');
       return true; // Allow all origins if FRONTEND_URL not set or invalid
