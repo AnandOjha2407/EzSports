@@ -13,9 +13,13 @@ services:
       - key: NODE_ENV
         value: production
 
-  # Frontend Service (Static Site)
-  - type: static_site
+  # Frontend Service (Web Service serving static files)
+  - type: web
     name: ezports-frontend
     rootDir: .
+    env: node
     buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    startCommand: npm run serve
+    envVars:
+      - key: NODE_ENV
+        value: production
