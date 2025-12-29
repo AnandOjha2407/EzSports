@@ -23,9 +23,22 @@ const corsOptions = {
       // In production, use FRONTEND_URL if set, otherwise allow all (for easier setup)
       if (process.env.FRONTEND_URL) {
         const origins = process.env.FRONTEND_URL.split(',').map(url => url.trim()).filter(url => url);
-        return origins.length > 0 ? origins : true;
+        // Filter out invalid Railway default URLs (like just "railway.com" without subdomain)
+        const validOrigins = origins.filter(url => {
+          if (!url) return false;
+          if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
+          // Exclude generic railway.com without subdomain
+          if (url === 'https://railway.com' || url === 'http://railway.com') return false;
+          return true;
+        });
+        if (validOrigins.length > 0) {
+          console.log('✅ CORS allowed origins:', validOrigins);
+          return validOrigins;
+        }
+        console.warn('⚠️  FRONTEND_URL contains invalid URLs - allowing all origins for CORS');
       }
-      return true; // Allow all origins if FRONTEND_URL not set
+      console.warn('⚠️  FRONTEND_URL not set - allowing all origins for CORS');
+      return true; // Allow all origins if FRONTEND_URL not set or invalid
     }
     // Development origins
     return ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
