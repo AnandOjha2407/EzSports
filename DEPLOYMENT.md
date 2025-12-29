@@ -77,11 +77,11 @@ git push origin main
 ### Step 5: Update Backend CORS
 
 1. Go to backend service → Variables tab
-2. Update `FRONTEND_URL`:
+2. Update `FRONTEND_URL` with the **actual frontend URL** (not service reference):
    ```
-   FRONTEND_URL=${{ezports-frontend.RAILWAY_PUBLIC_DOMAIN}}
+   FRONTEND_URL=https://ezports-frontend-production.up.railway.app
    ```
-   (Replace `ezports-frontend` with your actual frontend service name)
+   **Important:** Use the actual frontend URL. Railway service references (`${{...}}`) may not resolve correctly. Use your actual frontend domain from Railway.
 
 ### Step 6: Verify Deployment
 
