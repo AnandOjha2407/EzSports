@@ -12,14 +12,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
-      - key: MONGODB_URI
-        sync: false  # Set this manually in Render dashboard
-      - key: JWT_SECRET
-        sync: false  # Set this manually in Render dashboard
-      - key: FRONTEND_URL
-        sync: false  # Set this manually after frontend deploys
 
   # Frontend Service (Static Site)
   - type: static
@@ -27,7 +19,3 @@ services:
     rootDir: .
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
-    envVars:
-      - key: VITE_API_URL
-        sync: false  # Set this manually to backend URL: https://ezports-backend.onrender.com/api
-
