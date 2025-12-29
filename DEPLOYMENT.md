@@ -63,6 +63,12 @@ git push origin main
    VITE_API_URL=${{ezports-backend.RAILWAY_PUBLIC_DOMAIN}}/api
    PORT=4173
    ```
+   
+   **Note about Railway warning:** Railway may warn about using `RAILWAY_PUBLIC_DOMAIN` and egress fees. For frontend applications, you MUST use the public domain because:
+   - The frontend runs in users' browsers (outside Railway's network)
+   - Browsers cannot access private domains (`RAILWAY_PRIVATE_DOMAIN`)
+   - The API URL is embedded at build time into the JavaScript bundle
+   - Egress fees only apply to server-to-server communication, not browser requests
 
 4. **Generate Public Domain:**
    - Settings → Domains → Generate Domain
