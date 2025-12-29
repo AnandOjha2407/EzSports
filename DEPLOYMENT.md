@@ -92,12 +92,26 @@ git push origin main
 3. Connect your GitHub repository
 4. Render will auto-detect `render.yaml`
 5. **Set Environment Variables** in Render dashboard:
-   - Backend service → Environment:
+
+   **Backend Service (ezports-backend):**
+   - Go to backend service → Environment tab
+   - Add these variables:
      ```
      MONGODB_URI=mongodb+srv://anandojha901_db_user:Anandkhkushi%402407@ezsports.jcmtpad.mongodb.net/ezports?retryWrites=true&w=majority
      JWT_SECRET=9608c8d2e7261d7820bd0c0723244073e5ee9d17734e45b1fcfb83fab693f0d2
+     FRONTEND_URL=https://ezports-frontend.onrender.com
      ```
-6. Deploy! Both services will be configured automatically.
+     (Update FRONTEND_URL after frontend deploys with actual URL)
+
+   **Frontend Service (ezports-frontend):**
+   - Go to frontend service → Environment tab
+   - Add this variable:
+     ```
+     VITE_API_URL=https://ezports-backend.onrender.com/api
+     ```
+     (Update with actual backend URL after backend deploys)
+
+6. Click **"Apply"** to deploy both services!
 
 ---
 

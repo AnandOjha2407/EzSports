@@ -19,26 +19,15 @@ services:
       - key: JWT_SECRET
         sync: false  # Set this manually in Render dashboard
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: ezports-frontend
-          property: url
+        sync: false  # Set this manually after frontend deploys
 
-  # Frontend Service
-  - type: web
+  # Frontend Service (Static Site)
+  - type: static
     name: ezports-frontend
     rootDir: .
-    env: node
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
-      - key: NODE_ENV
-        value: production
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: ezports-backend
-          property: url
-        prefix: true
-        suffix: /api
+        sync: false  # Set this manually to backend URL: https://ezports-backend.onrender.com/api
 
