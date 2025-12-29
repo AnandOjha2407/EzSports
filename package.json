@@ -1,0 +1,27 @@
+{
+  "name": "ezports",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:check": "vite build && vite preview",
+    "serve": "vite preview --host 0.0.0.0 --port $PORT",
+    "start": "npm run build && vite preview --host 0.0.0.0 --port $PORT"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "bootstrap": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8"
+  }
+}
+

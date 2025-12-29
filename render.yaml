@@ -1,0 +1,44 @@
+# Render Configuration for EZSports
+# Deploy both frontend and backend together from this repo
+
+services:
+  # Backend API Service
+  - type: web
+    name: ezports-backend
+    rootDir: backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false  # Set this manually in Render dashboard
+      - key: JWT_SECRET
+        sync: false  # Set this manually in Render dashboard
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: ezports-frontend
+          property: url
+
+  # Frontend Service
+  - type: web
+    name: ezports-frontend
+    rootDir: .
+    env: node
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: ezports-backend
+          property: url
+        prefix: true
+        suffix: /api
+

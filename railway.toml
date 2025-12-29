@@ -1,0 +1,25 @@
+# Railway Configuration for EZSports
+# This file helps Railway understand the project structure
+
+[build]
+builder = "nixpacks"
+
+# Backend Service
+[[services]]
+name = "backend"
+root = "./backend"
+start = "npm start"
+watch = ["./backend/**"]
+[services.variables]
+NODE_ENV = "production"
+
+# Frontend Service  
+[[services]]
+name = "frontend"
+root = "."
+start = "npm run preview"
+build = "npm run build"
+watch = ["./src/**", "./public/**"]
+[services.variables]
+NODE_ENV = "production"
+
