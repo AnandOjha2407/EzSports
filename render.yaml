@@ -1,5 +1,9 @@
 # Render Configuration for EZSports
 # Deploy both frontend and backend together from this repo
+#
+# IMPORTANT: Set environment variables in Render Dashboard (not here for security)
+# Backend: MONGODB_URI, JWT_SECRET, FRONTEND_URL, PORT (auto-set by Render)
+# Frontend: VITE_API_URL (must be set BEFORE first build), PORT (auto-set by Render)
 
 services:
   # Backend API Service
@@ -9,9 +13,14 @@ services:
     env: node
     buildCommand: npm install
     startCommand: npm start
+    plan: free  # Use 'starter' for paid tier
     envVars:
       - key: NODE_ENV
         value: production
+    # Note: Add these in Render Dashboard → Environment tab:
+    # - MONGODB_URI (your MongoDB Atlas connection string)
+    # - JWT_SECRET (min 32 characters, use: openssl rand -hex 32)
+    # - FRONTEND_URL (will be set after frontend deploys, e.g., https://ezports-frontend.onrender.com)
 
   # Frontend Service (Web Service serving static files)
   - type: web
@@ -20,6 +29,10 @@ services:
     env: node
     buildCommand: npm install && npm run build
     startCommand: npm run serve
+    plan: free  # Use 'starter' for paid tier
     envVars:
       - key: NODE_ENV
         value: production
+    # Note: Add this in Render Dashboard → Environment tab BEFORE first build:
+    # - VITE_API_URL (backend URL, e.g., https://ezports-backend.onrender.com/api)
+    #   IMPORTANT: Set this BEFORE the first build, as Vite embeds env vars at build time!
