@@ -16,52 +16,65 @@ validateEnv();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS Configuration
+// CORS Configuration - use FRONTEND_URL whenever set (critical for Render/Railway)
 const corsOptions = {
   origin: (() => {
-    if (process.env.NODE_ENV === 'production') {
-      // In production, use FRONTEND_URL if set and valid
-      if (process.env.FRONTEND_URL) {
-        const frontendUrl = process.env.FRONTEND_URL.trim();
-        
-        // Check if it's an invalid/unresolved Railway service reference or default URL
-        if (frontendUrl === 'https://railway.com' || 
-            frontendUrl === 'http://railway.com' ||
-            frontendUrl === 'railway.com' ||
-            frontendUrl.includes('${{') || // Railway service reference not resolved
-            (!frontendUrl.startsWith('http://') && !frontendUrl.startsWith('https://'))) {
-          console.warn('⚠️  FRONTEND_URL is invalid or unresolved:', frontendUrl);
-          console.warn('⚠️  Allowing all origins for CORS (please set FRONTEND_URL to your actual frontend URL)');
-          return true; // Allow all if invalid to prevent CORS errors
+    const devOrigins = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
+
+    // Always use FRONTEND_URL if set and valid (so CORS works even if NODE_ENV isn't set on Render)
+    if (process.env.FRONTEND_URL) {
+      const frontendUrl = process.env.FRONTEND_URL.trim();
+
+      if (
+        frontendUrl === 'https://railway.com' ||
+        frontendUrl === 'http://railway.com' ||
+        frontendUrl === 'railway.com' ||
+        frontendUrl.includes('${{') ||
+        (!frontendUrl.startsWith('http://') && !frontendUrl.startsWith('https://'))
+      ) {
+        console.warn('⚠️  FRONTEND_URL is invalid or unresolved:', frontendUrl);
+        if (process.env.NODE_ENV === 'production') {
+          console.warn('⚠️  Allowing all origins for CORS');
+          return true;
         }
-        
-        // Split by comma for multiple origins
-        const origins = frontendUrl.split(',').map(url => url.trim()).filter(url => {
+        return devOrigins;
+      }
+
+      // Strip trailing slashes so we match browser Origin (e.g. https://ezports-frontend.onrender.com)
+      const origins = frontendUrl
+        .split(',')
+        .map((url) => url.trim().replace(/\/+$/, ''))
+        .filter((url) => {
           if (!url) return false;
-          // Filter out invalid Railway default URLs
           if (url === 'https://railway.com' || url === 'http://railway.com') return false;
           if (!url.startsWith('http://') && !url.startsWith('https://')) return false;
           return true;
         });
-        
-        if (origins.length > 0) {
-          console.log('✅ CORS allowed origins:', origins);
-          return origins;
-        }
+
+      if (origins.length > 0) {
+        const combined = process.env.NODE_ENV === 'development' ? [...devOrigins, ...origins] : origins;
+        console.log('✅ CORS allowed origins:', combined);
+        return combined;
       }
-      console.warn('⚠️  FRONTEND_URL not set - allowing all origins for CORS');
-      return true; // Allow all origins if FRONTEND_URL not set or invalid
     }
-    // Development origins
-    return ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
+
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('⚠️  FRONTEND_URL not set in production - allowing all origins for CORS');
+      return true;
+    }
+    return devOrigins;
   })(),
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  preflightContinue: false,
 };
 
 app.use(cors(corsOptions));
+
+// Ensure preflight OPTIONS always gets CORS headers (belt-and-suspenders for Render)
+app.options('/api/*', cors(corsOptions));
 
 // Rate Limiting - More lenient for development, stricter for production
 const isDevelopment = process.env.NODE_ENV === 'development';
