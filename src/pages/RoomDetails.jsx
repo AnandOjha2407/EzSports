@@ -12,15 +12,19 @@ const RoomDetails = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!roomId || roomId === 'undefined') {
+      setLoading(false)
+      return
+    }
+
     const fetchRoom = async () => {
       try {
         const { roomStorage } = await import('../services/storage')
-        const fetchedRoom = roomStorage.getById(roomId)
-        
+        const fetchedRoom = await roomStorage.getById(roomId)
+
         if (fetchedRoom) {
           setRoom(fetchedRoom)
         } else {
-          // Try API
           try {
             const { roomService } = await import('../services/api')
             const data = await roomService.getById(roomId)
@@ -38,9 +42,7 @@ const RoomDetails = () => {
       }
     }
 
-    if (roomId) {
-      fetchRoom()
-    }
+    fetchRoom()
   }, [roomId, navigate])
 
   if (loading) {
@@ -78,7 +80,7 @@ const RoomDetails = () => {
             </span>
           </div>
           <h1>{room.roomName}</h1>
-          <p className="room-game-type">{room.gameType.toUpperCase()}</p>
+          <p className="room-game-type">{(room.gameType ?? '').toUpperCase() || 'N/A'}</p>
         </div>
 
         <div className="room-details-content">
@@ -92,7 +94,7 @@ const RoomDetails = () => {
                 </div>
                 <div className="info-item">
                   <span className="info-label">Status:</span>
-                  <span className="info-value">{room.status.toUpperCase()}</span>
+                  <span className="info-value">{(room.status ?? '').toUpperCase() || 'N/A'}</span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Max Players:</span>

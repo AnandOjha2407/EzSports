@@ -70,7 +70,7 @@ const RoomCards = () => {
       case 'ended':
         return '⚪ ENDED'
       default:
-        return status.toUpperCase()
+        return (status ?? '').toUpperCase() || 'N/A'
     }
   }
 
@@ -104,6 +104,8 @@ const RoomCards = () => {
         ) : (
           <div className="room-cards-grid">
             {rooms.map((room) => {
+              const roomId = room.id ?? room._id
+              if (!roomId) return null
               const gameImages = getGameImages(room.gameType)
               const gamePath = `/game/${room.gameType}`
               const isLive = room.status === 'live'
@@ -112,9 +114,9 @@ const RoomCards = () => {
               const statusLabel = getStatusLabel(room.status)
               
               return (
-                <div key={room.id} className="room-card">
+                <div key={roomId} className="room-card">
                   <div className="room-card-wrapper">
-                    <Link to={`/room/${room.id}`} className="room-card-link">
+                    <Link to={`/room/${roomId}`} className="room-card-link">
                       <div className="room-card-image-container">
                         <img 
                           src={gameImages.normal} 
@@ -135,13 +137,13 @@ const RoomCards = () => {
                         <div className="room-card-overlay" />
                         <div className="room-card-title-overlay">
                           <h3 className="room-title">{room.roomName}</h3>
-                          <p className="room-game-type">{room.gameType.toUpperCase()}</p>
+                          <p className="room-game-type">{(room.gameType ?? '').toUpperCase() || 'N/A'}</p>
                         </div>
                       </div>
                     </Link>
                     <div className="room-card-body">
                       <p className="room-description">
-                        {room.description || `Join ${room.roomName} for ${room.gameType.toUpperCase()} gaming sessions`}
+                        {room.description || `Join ${room.roomName} for ${(room.gameType ?? '').toUpperCase() || 'GAME'} gaming sessions`}
                       </p>
                       <div className="room-info">
                         {room.creatorUsername && (
@@ -177,7 +179,7 @@ const RoomCards = () => {
                             </button>
                           ) : (
                             <Link 
-                              to={`/room/${room.id}`} 
+                              to={`/room/${roomId}`} 
                               className="room-btn room-btn-primary"
                             >
                               {room.status === 'scheduled' ? 'View Details' : 'Join Room'}

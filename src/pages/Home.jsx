@@ -67,11 +67,12 @@ const Home = () => {
             <div className="rooms-preview-grid">
               {rooms.slice(0, 3).map((room) => {
                 const gameImages = getGameImages(room.gameType)
-                
+                const roomId = room.id ?? room._id
+                if (!roomId) return null
                 return (
                   <Link
-                    key={room.id}
-                    to={`/room/${room.id}`}
+                    key={roomId}
+                    to={`/room/${roomId}`}
                     className="room-preview-card"
                   >
                     <div className="room-preview-image">
@@ -101,7 +102,7 @@ const Home = () => {
                       <div className="room-preview-header">
                         <h3>{room.roomName}</h3>
                       </div>
-                      <p className="room-preview-game">{room.gameType.toUpperCase()}</p>
+                      <p className="room-preview-game">{(room.gameType ?? '').toUpperCase() || 'N/A'}</p>
                       <p className="room-preview-creator">by {room.creatorUsername}</p>
                       {room.description && (
                         <p className="room-preview-description">{room.description}</p>
