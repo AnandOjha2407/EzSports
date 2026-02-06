@@ -88,7 +88,7 @@ export const roomService = {
     body: JSON.stringify(roomData),
   }),
   
-  getLive: () => apiCall('/rooms/live'),
+  getLive: () => apiCall('/rooms/live/all'),
   
   getByGame: (gameType) => apiCall(`/rooms/game/${gameType}`),
   
@@ -116,7 +116,7 @@ export const roomService = {
 
 // Streams
 export const streamService = {
-  getLive: () => apiCall('/streams/live'),
+  getLive: () => apiCall('/streams/live/all'),
   
   getByGame: (gameType) => apiCall(`/streams/game/${gameType}`),
   
