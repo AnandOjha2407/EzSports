@@ -16,6 +16,11 @@ validateEnv();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust first proxy (Render, Railway, etc.) so rate-limit and req.ip work correctly
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // CORS Configuration - use FRONTEND_URL whenever set (critical for Render/Railway)
 const corsOptions = {
   origin: (() => {
