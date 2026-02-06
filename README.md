@@ -2,6 +2,8 @@
 
 A full-stack esports platform built with React and Node.js, where gamers can discover tournaments, join gaming rooms, create content, and participate in competitive gaming events.
 
+**Demo:** https://ezports-frontend.onrender.com/
+
 ## 🚀 Tech Stack
 
 ### Frontend
