@@ -20,5 +20,13 @@ export default defineConfig({
     port: 5173,
     host: true,
   },
+  preview: {
+    host: true,
+    port: process.env.PORT || 10000,
+    allowedHosts: [
+      'ezports-frontend.onrender.com',
+      '.onrender.com', // Allow all Render subdomains
+    ],
+  },
 })
 
